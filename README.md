@@ -1,2 +1,2 @@
-# IIA-Personal-Finance-Aggregation
+# FinSync-Financial-Aggregation-Platform
 IIA Course Project 
