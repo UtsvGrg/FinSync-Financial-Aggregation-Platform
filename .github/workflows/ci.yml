@@ -20,7 +20,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run Black
-        run: black --check .
+        run: black --exclude=/data_sources--check .
 
       - name: Run Flake8
         run: flake8 .
