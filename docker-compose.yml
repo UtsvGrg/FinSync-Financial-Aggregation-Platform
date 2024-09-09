@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  pnl:
+    build:
+      context: ./data_sources/PNL
+    ports:
+      - "5001:5000"
+    networks:
+      - pnl_network
+    container_name: pnl-container
+
+  balance:
+    build:
+      context: ./data_sources/Balance
+    ports:
+      - "5002:5000"
+    networks:
+      - balance_network
+    container_name: balance-container
+
+  cashflow:
+    build:
+      context: ./data_sources/Cash
+    ports:
+      - "5003:5000"
+    networks:
+      - cashflow_network
+    container_name: cashflow-container
+
+networks:
+  pnl_network:
+    driver: bridge
+  balance_network:
+    driver: bridge
+  cashflow_network:
+    driver: bridge
