@@ -1,0 +1,122 @@
+[
+    {
+      "assets_current": 20000,
+      "assets_non_current": 30000,
+      "company_id": null,
+      "date": "2024-09-01",
+      "equity": 25000,
+      "id": 1,
+      "liabilities_current": 10000,
+      "liabilities_non_current": 15000
+    },
+    {
+      "assets_current": 21000,
+      "assets_non_current": 31000,
+      "company_id": null,
+      "date": "2024-09-02",
+      "equity": 26000,
+      "id": 2,
+      "liabilities_current": 10500,
+      "liabilities_non_current": 15500
+    },
+    {
+      "assets_current": 50000,
+      "assets_non_current": 20000,
+      "company_id": "COMP001",
+      "date": "2024-09-01",
+      "equity": 45000,
+      "id": 3,
+      "liabilities_current": 15000,
+      "liabilities_non_current": 10000
+    },
+    {
+      "assets_current": 55000,
+      "assets_non_current": 21000,
+      "company_id": "COMP002",
+      "date": "2024-09-02",
+      "equity": 49000,
+      "id": 4,
+      "liabilities_current": 16000,
+      "liabilities_non_current": 11000
+    },
+    {
+      "assets_current": 52000,
+      "assets_non_current": 22000,
+      "company_id": "COMP003",
+      "date": "2024-09-03",
+      "equity": 48000,
+      "id": 5,
+      "liabilities_current": 15500,
+      "liabilities_non_current": 10500
+    },
+    {
+      "assets_current": 58000,
+      "assets_non_current": 23000,
+      "company_id": "COMP004",
+      "date": "2024-09-04",
+      "equity": 50000,
+      "id": 6,
+      "liabilities_current": 16500,
+      "liabilities_non_current": 11500
+    },
+    {
+      "assets_current": 60000,
+      "assets_non_current": 24000,
+      "company_id": "COMP005",
+      "date": "2024-09-05",
+      "equity": 51000,
+      "id": 7,
+      "liabilities_current": 17000,
+      "liabilities_non_current": 12000
+    },
+    {
+      "assets_current": 62000,
+      "assets_non_current": 25000,
+      "company_id": "COMP006",
+      "date": "2024-09-06",
+      "equity": 52000,
+      "id": 8,
+      "liabilities_current": 17500,
+      "liabilities_non_current": 12500
+    },
+    {
+      "assets_current": 64000,
+      "assets_non_current": 26000,
+      "company_id": "COMP007",
+      "date": "2024-09-07",
+      "equity": 53000,
+      "id": 9,
+      "liabilities_current": 18000,
+      "liabilities_non_current": 13000
+    },
+    {
+      "assets_current": 66000,
+      "assets_non_current": 27000,
+      "company_id": "COMP008",
+      "date": "2024-09-08",
+      "equity": 54000,
+      "id": 10,
+      "liabilities_current": 18500,
+      "liabilities_non_current": 13500
+    },
+    {
+      "assets_current": 68000,
+      "assets_non_current": 28000,
+      "company_id": "COMP009",
+      "date": "2024-09-09",
+      "equity": 55000,
+      "id": 11,
+      "liabilities_current": 19000,
+      "liabilities_non_current": 14000
+    },
+    {
+      "assets_current": 70000,
+      "assets_non_current": 29000,
+      "company_id": "COMP010",
+      "date": "2024-09-10",
+      "equity": 56000,
+      "id": 12,
+      "liabilities_current": 19500,
+      "liabilities_non_current": 14500
+    }
+  ]

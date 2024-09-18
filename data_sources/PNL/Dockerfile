@@ -10,12 +10,13 @@ WORKDIR /app
 # Copy the application files
 COPY app.py /app/
 COPY init_db.py /app/
+COPY data.json /app/
 
 # Initialize the database
-RUN python init_db.py
+RUN python3 init_db.py
 
 # Expose the port the app runs on
-EXPOSE 5000
+EXPOSE 5001
 
 # Run the application
-CMD ["python", "app.py"]
+CMD ["python3", "app.py"]
