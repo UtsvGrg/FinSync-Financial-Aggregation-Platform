@@ -1,22 +1,24 @@
 # Use a base image with Python
 FROM python:3.9-slim
 
-# Install necessary packages
-RUN pip install flask
+# Install necessary packages and clean up
+RUN apt-get update && \
+    apt-get install -y sqlite3 && \
+    pip install flask && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Set the working directory
 WORKDIR /app
 
-# Copy the application files and database initialization script
-COPY app.py /app/
-COPY init_db.py /app/
-COPY cash.json /app/  # Include this if cash_flow.json is needed for initialization
+# Copy the application files
+COPY app.py init_db.py cash.json ./
 
 # Initialize the database
 RUN python init_db.py
 
 # Expose the port the app runs on
-EXPOSE 5003
+EXPOSE 5000
 
 # Run the application
 CMD ["python", "app.py"]

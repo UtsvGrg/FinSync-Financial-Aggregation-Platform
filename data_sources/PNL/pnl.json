@@ -1,0 +1,57 @@
+[
+  {
+    "company_id": "Applee",
+    "date": "2024-01-01",
+    "cost_of_goods_sold": 5000000,
+    "operating_expenses": 2000000,
+    "depreciation": 500000,
+    "amortization": 100000,
+    "interest_expense": 200000,
+    "taxes": 800000,
+    "net_income": 1400000
+  },
+  {
+    "company_id": "Google",
+    "date": "2024-01-01",
+    "cost_of_goods_sold": 6000000,
+    "operating_expenses": 2500000,
+    "depreciation": 700000,
+    "amortization": 150000,
+    "interest_expense": 250000,
+    "taxes": 900000,
+    "net_income": 1600000
+  },
+  {
+    "company_id": "Microsoft",
+    "date": "2024-01-01",
+    "cost_of_goods_sold": 4500000,
+    "operating_expenses": 1800000,
+    "depreciation": 450000,
+    "amortization": 90000,
+    "interest_expense": 180000,
+    "taxes": 750000,
+    "net_income": 1230000
+  },
+  {
+    "company_id": "Amazon",
+    "date": "2024-01-01",
+    "cost_of_goods_sold": 5500000,
+    "operating_expenses": 2200000,
+    "depreciation": 550000,
+    "amortization": 110000,
+    "interest_expense": 220000,
+    "taxes": 850000,
+    "net_income": 1520000
+  },
+  {
+    "company_id": "Meta",
+    "date": "2024-01-01",
+    "cost_of_goods_sold": 7000000,
+    "operating_expenses": 2800000,
+    "depreciation": 700000,
+    "amortization": 140000,
+    "interest_expense": 280000,
+    "taxes": 1000000,
+    "net_income": 2080000
+  }
+]

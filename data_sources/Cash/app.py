@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import sqlite3
 
 app = Flask(__name__)
@@ -15,5 +15,20 @@ def get_data():
     conn.close()
     return jsonify([dict(row) for row in data])
 
+@app.route('/query')
+def execute_query():
+    query = request.args.get('q')
+    if not query:
+        return jsonify({"error": "No query provided"}), 400
+    
+    conn = get_db_connection()
+    try:
+        data = conn.execute(query).fetchall()
+        return jsonify([dict(row) for row in data])
+    except sqlite3.Error as e:
+        return jsonify({"error": str(e)}), 400
+    finally:
+        conn.close()
+
 if __name__ == '__main__':
-    app.run(host='localhost', port=5003)
+    app.run(host='0.0.0.0', port=5000)

@@ -1,53 +1,58 @@
-# Project Name
-
-[FinSync-Financial-Aggregation-Platform](https://github.com/UtsvGrg/FinSync-Financial-Aggregation-Platform)
+# FinSync-Financial-Aggregation-Platform
 
 ## Table of Contents
 
-- [Project Name](#project-name)
+- [FinSync-Financial-Aggregation-Platform](#finsync-financial-aggregation-platform)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
   - [Setup](#setup)
+    - [Docker Setup](#docker-setup)
     - [Local Environment](#local-environment)
     - [Dependencies](#dependencies)
   - [Usage](#usage)
+    - [Running with Docker](#running-with-docker)
+    - [Accessing the Services](#accessing-the-services)
     - [Black](#black)
     - [Flake8](#flake8)
     - [pytest](#pytest)
+  - [Project Structure](#project-structure)
   - [Continuous Integration](#continuous-integration)
-    - [CI Pipeline](#ci-pipeline)
   - [Contributing](#contributing)
   - [License](#license)
 
 ## Introduction
 
-**FinSync-Financial-Aggregation-Platform** is an information integration application which tracks the financial operations of an enterprise pouring in from different sources such as bank statements, ERP systems, CRM systems, tax systems etc.
+**FinSync-Financial-Aggregation-Platform** is an information integration application that tracks the financial operations of an enterprise, aggregating data from different sources such as bank statements, ERP systems, CRM systems, and tax systems.
 
 ## Setup
 
-### Local Environment
+### Docker Setup
 
-To set up the local development environment, follow these steps:
+To run the application using Docker:
 
-1. **Clone the repository**:
+1. Ensure you have Docker and Docker Compose installed on your system.
+2. Clone the repository:
    ```bash
    git clone https://github.com/UtsvGrg/FinSync-Financial-Aggregation-Platform.git
    cd FinSync-Financial-Aggregation-Platform
    ```
+3. Build and run the Docker containers:
+   ```bash
+   docker-compose build
+   docker-compose up
+   ```
 
-2. **Create and activate a virtual environment**:
-   - On macOS/Linux:
-     ```bash
-     python3 -m venv venv
-     source venv/bin/activate
-     ```
-   - On Windows:
-     ```bash
-     python -m venv venv
-     .\venv\Scripts\activate
-     ```
+### Local Environment
 
-3. **Install the required dependencies**:
+For local development without Docker:
+
+1. Follow steps 1-2 from the Docker setup.
+2. Create and activate a virtual environment:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
+   ```
+3. Install the required dependencies:
    ```bash
    pip install -r requirements.txt
    ```
@@ -56,77 +61,86 @@ To set up the local development environment, follow these steps:
 
 The project uses the following Python tools:
 
-- **Black**: A code formatter that ensures consistent style.
-- **Flake8**: A linting tool that checks for style guide enforcement and simple errors.
+- **Flask**: A micro web framework for Python.
+- **SQLite3**: A lightweight disk-based database.
+- **Black**: A code formatter for consistent style.
+- **Flake8**: A linting tool for style guide enforcement.
 - **pytest**: A testing framework to ensure code correctness.
-
-These dependencies are listed in `requirements.txt`.
 
 ## Usage
 
+### Running with Docker
+
+To start the application:
+
+```bash
+docker-compose up
+```
+
+To rebuild the containers after making changes:
+
+```bash
+docker-compose build
+docker-compose up
+```
+
+### Accessing the Services
+
+After starting the containers, you can access the services at:
+
+- PNL: http://localhost:5001/data
+- Balance: http://localhost:5002/data
+- Cash Flow: http://localhost:5003/data
+
 ### Black
 
-**Black** is used to format your code automatically:
+To format your code:
 
-- To format your code:
-  ```bash
-  black .
-  ```
-- To check if the code is formatted correctly without changing files:
-  ```bash
-  black --check .
-  ```
+```bash
+black .
+```
 
 ### Flake8
 
-**Flake8** is used to enforce style guidelines and catch errors:
+To run the linter:
 
-- To run Flake8 on your codebase:
-  ```bash
-  flake8 .
-  ```
-- To customize Flake8 settings, edit the `.flake8` file in the root directory.
+```bash
+flake8 .
+```
 
 ### pytest
 
-**pytest** is used to run tests and ensure your code works as expected:
+To run tests:
 
-- To run all tests:
-  ```bash
-  pytest
-  ```
-- To run a specific test file:
-  ```bash
-  pytest path/to/test_file.py
-  ```
-- For verbose output:
-  ```bash
-  pytest -v
-  ```
+```bash
+pytest
+```
+
+## Project Structure
+
+The project is organized into three main services:
+
+- **PNL (Profit and Loss)**
+- **Balance Sheet**
+- **Cash Flow**
+
+Each service has its own directory under `data_sources/` containing:
+
+- `Dockerfile`: Defines the container for the service.
+- `app.py`: The Flask application for the service.
+- `init_db.py`: Script to initialize the SQLite database.
+- JSON file with sample data.
 
 ## Continuous Integration
 
-This project uses **GitHub Actions** to run a Continuous Integration (CI) pipeline.
-
-### CI Pipeline
-
-The CI pipeline is triggered on every push and pull request. It performs the following steps:
-
-1. **Check out the code**.
-2. **Set up Python** (specified version).
-3. **Install dependencies**.
-4. **Run Black** with `--check` to ensure code formatting.
-5. **Run Flake8** to check for style guide adherence.
-6. **Run pytest** to execute the test suite.
-
-You can view the status of the CI pipeline under the "Actions" tab of the repository.
+This project uses GitHub Actions for CI. The pipeline runs on every push and pull request, performing code formatting checks, linting, and running tests.
 
 ## Contributing
 
-If you'd like to contribute to this project, please fork the repository and use a feature branch. Pull requests are warmly welcome.
+Contributions are welcome! Please fork the repository and create a pull request with your changes.
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the MIT License.
 
 ---

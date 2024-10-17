@@ -1,21 +1,23 @@
 FROM python:3.9-slim
 
-# Install necessary packages
-RUN pip install flask
+# Install necessary packages and clean up
+RUN apt-get update && \
+    apt-get install -y sqlite3 && \
+    pip install flask && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Set the working directory
 WORKDIR /app
 
 # Copy the application files
-COPY app.py /app/
-COPY init_db.py /app/
-COPY balance.json /app/
+COPY app.py init_db.py balance.json ./
 
 # Initialize the database
-RUN python3 init_db.py
+RUN python init_db.py
 
 # Expose the port the app runs on
-EXPOSE 5002
+EXPOSE 5000
 
 # Run the application
-CMD ["python3", "app.py"]
+CMD ["python", "app.py"]

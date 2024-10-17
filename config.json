@@ -1,0 +1,35 @@
+{
+    "schema_mapping": {
+      "pnl": {
+        "cost_of_goods_sold": "revenue",
+        "operating_expenses": "operating_expenses",
+        "depreciation": "long_term_assets",
+        "amortization": "amortization",
+        "interest_expense": "cash_raised_spent_on_debt",
+        "taxes": "taxes",
+        "net_income": "net_income"
+      },
+      "balance_sheet": {
+        "current_assets": "ending_cash",
+        "cash": "cash",
+        "long_term_assets": "long_term_assets",
+        "current_liabilities": "current_liabilities",
+        "long_term_debt": "cash_raised_spent_on_debt",
+        "common_stock": "cash_raised_spent_on_equity",
+        "retained_earnings": "net_income"
+      },
+      "cash_flow_statement": {
+        "beginning_cash": "ending_cash",
+        "net_income": "net_income",
+        "non_cash_items": "non_cash_items",
+        "depreciation": "long_term_assets",
+        "amortization": "amortization",
+        "change_in_working_capital": "current_liabilities",
+        "cash_raised_spent_on_debt": "cash_raised_spent_on_debt",
+        "cash_raised_spent_on_equity": "cash_raised_spent_on_equity",
+        "ending_cash": "ending_cash"
+      }
+    },
+
+    "company_ids": ["Apple", "Google", "Microsoft", "Amazon", "Meta"]
+}
