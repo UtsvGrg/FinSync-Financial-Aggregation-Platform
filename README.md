@@ -56,6 +56,17 @@ For local development without Docker:
    ```bash
    pip install -r requirements.txt
    ```
+4. To run the frontend:
+   ```bash
+   cd data_aggregator
+   python manage.py runserver
+   ```
+5. Open the browser and go to
+   ```bash
+   http://127.0.0.1:8000/query/
+   ```
+   
+   
 
 ### Dependencies
 
