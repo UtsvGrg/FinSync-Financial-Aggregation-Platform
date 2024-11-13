@@ -107,7 +107,7 @@ def query_view(request):
                     "cash_raised_spent_on_debt": "interest_expense",
                     "taxes": "taxes",
                     "long_term_assets": "depreciation"
-                    #update later long term assests...
+                   
                 },
                 "balance_sheet": {
                     "ending_cash": "current_assets",
