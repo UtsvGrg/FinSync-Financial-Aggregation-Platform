@@ -1,0 +1,53 @@
+{
+    "queries": [
+        {
+            "data_type": "pnl",
+            "condition": "cost_of_goods_sold < 100000",
+            "columns": [
+                "cost_of_goods_sold"
+            ]
+        },
+        {
+            "data_type": "pnl",
+            "condition": "operating_expenses > 10000",
+            "columns": [
+                "operating_expenses"
+            ]
+        },
+        {
+            "data_type": "pnl",
+            "condition": "depreciation > 10000",
+            "columns": [
+                "depreciation"
+            ]
+        },
+        {
+            "data_type": "cash_flow",
+            "condition": "cash > 1000",
+            "columns": [
+                "cash"
+            ]
+        },
+        {
+            "data_type": "balance_sheet",
+            "condition": "current_liabilities > 1000",
+            "columns": [
+                "current_liabilities"
+            ]
+        },
+        {
+            "data_type": "cash_flow",
+            "condition": "common_stock > 1000",
+            "columns": [
+                "common_stock"
+            ]
+        },
+        {
+            "data_type": "general",
+            "condition": "non_cash_items > 1000",
+            "columns": [
+                "non_cash_items"
+            ]
+        }
+    ]
+}

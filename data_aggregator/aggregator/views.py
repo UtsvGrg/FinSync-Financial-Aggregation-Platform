@@ -5,10 +5,9 @@ from .backend_logic import federate_queries, schema_mapping, aggregate_results, 
 import os
 from datetime import datetime
 import csv
-
-# aggregator/views.py
+import json
 def download_csv(request, filename):
-    file_path = os.path.join(r'aggregator\output', filename)
+    file_path = os.path.join(r'aggregator/output', filename)
     if os.path.exists(file_path):
         with open(file_path, 'rb') as f:
             response = HttpResponse(f.read(), content_type='text/csv')
@@ -16,8 +15,23 @@ def download_csv(request, filename):
             return response
     else:
         return HttpResponse("File not found.", status=404)
+def generate_query(container, form_data, mapping):
+    query = f"SELECT * FROM {container} WHERE "
+    conditions = []
+    for field, mapped_field in mapping[container].items():
+        if field in form_data and f'{field}_operator' in form_data:
+            value = form_data[field]
+            operator = form_data[f'{field}_operator']
+            if value is not None and operator:
+                conditions.append(f"{mapped_field} {operator} {value}")
+            #else print("Give Correct Input")    
+    if conditions:
+        query += " AND ".join(conditions)
+    else:
+        query = query.rstrip(" WHERE ")
 
-
+    return query    
+    
 def query_view(request):
     if request.method == 'POST':
         form = QueryForm(request.POST)
@@ -58,27 +72,77 @@ def query_view(request):
 
             non_cash_items = form.cleaned_data['non_cash_items']
             non_cash_items_operator = form.cleaned_data['non_cash_items_operator']
-
-            print(revenue_operator)
-            print(revenue)
-
-            ## Generate the following queries from the data recieved from above
-            pnl_query = "SELECT * FROM pnl WHERE cost_of_goods_sold > 100000"
-            balance_query = "SELECT * FROM balance_sheet WHERE current_assets > 50000"
-            cash_query = "SELECT * FROM cash_flow WHERE beginning_cash > 100000"
-
+            input_form = {
+                'revenue': revenue,
+                'revenue_operator': revenue_operator,
+                'operating_expenses': operating_expenses,
+                'operating_expenses_operator': operating_expenses_operator,
+                'long_term_assets': long_term_assets,
+                'long_term_assets_operator': long_term_assets_operator,
+                'amortization': amortization,
+                'amortization_operator': amortization_operator,
+                'cash_raised_spent_on_debt': cash_raised_spent_on_debt,
+                'cash_raised_spent_on_debt_operator': cash_raised_spent_on_debt_operator,
+                'taxes': taxes,
+                'taxes_operator': taxes_operator,
+                'net_income': net_income,
+                'net_income_operator': net_income_operator,
+                'ending_cash': ending_cash,
+                'ending_cash_operator': ending_cash_operator,
+                'cash': cash,
+                'cash_operator': cash_operator,
+                'current_liabilities': current_liabilities,
+                'current_liabilities_operator': current_liabilities_operator,
+                'cash_raised_spent_on_equity': cash_raised_spent_on_equity,
+                'cash_raised_spent_on_equity_operator':cash_raised_spent_on_equity_operator,
+                'non_cash_items':non_cash_items,
+                'non_cash_items_operator': non_cash_items_operator
+            }
+            field_mapping = {
+                "pnl": {
+                    "revenue": "cost_of_goods_sold",
+                    "operating_expenses": "operating_expenses",
+                    "amortization": "amortization",
+                    "net_income": "net_income",
+                    "cash_raised_spent_on_debt": "interest_expense",
+                    "taxes": "taxes",
+                    "long_term_assets": "depreciation"
+                    #update later long term assests...
+                },
+                "balance_sheet": {
+                    "ending_cash": "current_assets",
+                    "cash": "cash",
+                    "current_liabilities": "current_liabilities",
+                    "long_term_assets": "long_term_assets",
+                    "cash_raised_spent_on_debt": "long_term_debt",
+                    "cash_raised_spent_on_equity": "common_stock",
+                    "net_income": "retained_earnings"
+                },
+                "cash_flow": {
+                    "ending_cash": "beginning_cash",
+                    "net_income": "net_income",
+                    "non_cash_items": "non_cash_items",
+                    "long_term_assets": "depreciation",
+                    "amortization": "amortization",
+                    "current_liabilities": "change_in_working_capital",
+                    "cash_raised_spent_on_debt": "cash_raised_spent_on_debt",
+                    "cash_raised_spent_on_equity": "cash_raised_spent_on_equity"
+                }
+            }
+            pnl_query = generate_query("pnl", input_form, field_mapping)
+            balance_query = generate_query("balance_sheet", input_form, field_mapping)
+            cash_query = generate_query("cash_flow", input_form, field_mapping)
+            print("Pnl:", pnl_query)
+            print("Balance_Sheet:", balance_query)
+            print("Cash_Flow:", cash_query)
             queries = {
                 "pnl": pnl_query,
                 "balance_sheet": balance_query,
                 "cash_flow_statement": cash_query
             }
-
-            # Federate queries and process results
             results = federate_queries(queries)
             schema_map = schema_mapping()
             aggregated_results = aggregate_results(results, schema_map)
-
-            # Generate filename and write to CSV
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"aggregated_results_{timestamp}.csv"
             output_path = os.path.join(r'aggregator\output', filename)
@@ -89,8 +153,6 @@ def query_view(request):
                 reader = csv.DictReader(csvfile)
                 for row in reader:
                     csv_content.append(row)
-
-            # Pass the CSV content to the template
             return render(request, 'aggregator/query_form.html', {
                 'form': form,
                 'csv_content': csv_content,

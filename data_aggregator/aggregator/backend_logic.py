@@ -34,13 +34,13 @@ def federate_queries(queries):
     return results
 
 def schema_mapping():
-    with open(r'aggregator\config.json', 'r') as config_file:
+    with open(r'aggregator/config.json', 'r') as config_file:
         config = json.load(config_file)
     print("Schema mapping loaded from config.json")
     return config['schema_mapping']
 
 def load_company_ids():
-    with open(r'aggregator\config.json', 'r') as config_file:
+    with open(r'aggregator/config.json', 'r') as config_file:
         config = json.load(config_file)
     print(f"Loaded {len(config['company_ids'])} valid company IDs from config.json")
     return config['company_ids']
