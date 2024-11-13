@@ -135,6 +135,7 @@ def query_view(request):
             print("Pnl:", pnl_query)
             print("Balance_Sheet:", balance_query)
             print("Cash_Flow:", cash_query)
+            #Mapping of queries
             queries = {
                 "pnl": pnl_query,
                 "balance_sheet": balance_query,
