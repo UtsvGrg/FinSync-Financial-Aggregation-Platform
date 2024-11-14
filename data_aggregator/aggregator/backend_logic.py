@@ -108,7 +108,7 @@ def finalize_aggregated_data(aggregated_data, valid_company_ids):
 def write_to_csv(data, filename):
     if not data:
         print("No data to write to CSV")
-        return
+        return None
 
     keys = set()
     for item in data:
@@ -124,6 +124,7 @@ def write_to_csv(data, filename):
             dict_writer.writerow(row_with_all_keys)
     
     print(f"Data written to {filename}")
+    return 0
     
 
 def main():

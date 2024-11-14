@@ -6,6 +6,8 @@ import os
 from datetime import datetime
 import csv
 import json
+from django.shortcuts import redirect
+
 def download_csv(request, filename):
     file_path = os.path.join(r'aggregator/output', filename)
     if os.path.exists(file_path):
@@ -31,6 +33,10 @@ def generate_query(container, form_data, mapping):
         query = query.rstrip(" WHERE ")
 
     return query    
+
+
+def default_view(request):
+    return redirect('/query/')
     
 def query_view(request):
     if request.method == 'POST':
@@ -147,7 +153,9 @@ def query_view(request):
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"aggregated_results_{timestamp}.csv"
             output_path = os.path.join(r'aggregator\output', filename)
-            write_to_csv(aggregated_results, output_path)
+            if write_to_csv(aggregated_results, output_path) == None:
+                output_path = os.path.join(r'aggregator\output', 'aggregated_results_empty.csv')
+                print(output_path)
 
             csv_content = []
             with open(output_path, newline='') as csvfile:
