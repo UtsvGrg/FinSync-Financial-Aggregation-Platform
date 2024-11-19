@@ -9,7 +9,7 @@ import json
 from django.shortcuts import redirect
 
 def download_csv(request, filename):
-    file_path = os.path.join(r'aggregator/output', filename)
+    file_path = os.path.join(r'aggregator\output', filename)
     if os.path.exists(file_path):
         with open(file_path, 'rb') as f:
             response = HttpResponse(f.read(), content_type='text/csv')
@@ -30,7 +30,7 @@ def generate_query(container, form_data, mapping):
     if conditions:
         query += " AND ".join(conditions)
     else:
-        query = query.rstrip(" WHERE ")
+        query = f"SELECT * FROM {container} WHERE 1=0"
 
     return query    
 
@@ -138,6 +138,12 @@ def query_view(request):
             pnl_query = generate_query("pnl", input_form, field_mapping)
             balance_query = generate_query("balance_sheet", input_form, field_mapping)
             cash_query = generate_query("cash_flow", input_form, field_mapping)
+            print(pnl_query)
+            # if "1=0" in pnl_query and "1=0" in cash_query and "1=0" in balance_query:
+            #     # print("hello")
+            #     pnl_query="SELECT * FROM pnl"
+            #     balance_query="SELECT * FROM balance_sheet"
+            #     cash_query="SELECT * FROM cash_flow_statement"
             print("Pnl:", pnl_query)
             print("Balance_Sheet:", balance_query)
             print("Cash_Flow:", cash_query)
@@ -152,9 +158,9 @@ def query_view(request):
             aggregated_results = aggregate_results(results, schema_map)
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"aggregated_results_{timestamp}.csv"
-            output_path = os.path.join(r'aggregator\output', filename)
+            output_path = os.path.join(r'aggregator/output', filename)
             if write_to_csv(aggregated_results, output_path) == None:
-                output_path = os.path.join(r'aggregator\output', 'aggregated_results_empty.csv')
+                output_path = os.path.join(r'aggregator/output', 'aggregated_results_empty.csv')
                 print(output_path)
 
             csv_content = []

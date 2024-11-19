@@ -61,11 +61,13 @@ def aggregate_results(results, schema_map):
 def process_data_type(data_type, data, aggregated_data, schema_map, valid_company_ids):
     for item in data:
         company_id = process_company_id(item.get('company_id'), valid_company_ids)
+        item['company_id']=company_id
         if company_id is None:
             continue
         
         if company_id not in aggregated_data:
             aggregated_data[company_id] = {}
+        
         
         process_item(item, company_id, data_type, aggregated_data, schema_map)
 

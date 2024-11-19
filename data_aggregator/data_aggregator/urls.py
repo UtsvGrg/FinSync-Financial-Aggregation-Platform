@@ -20,6 +20,7 @@ from django.urls import path
 from aggregator import views
 
 urlpatterns = [
+    path('', views.default_view, name='default'),
     path('admin/', admin.site.urls),
     path('query/', views.query_view, name='query_view'),
     path('download/<str:filename>/', views.download_csv, name='download_csv'),
