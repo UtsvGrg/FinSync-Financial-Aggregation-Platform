@@ -138,12 +138,11 @@ def query_view(request):
             pnl_query = generate_query("pnl", input_form, field_mapping)
             balance_query = generate_query("balance_sheet", input_form, field_mapping)
             cash_query = generate_query("cash_flow", input_form, field_mapping)
-            print(pnl_query)
-            # if "1=0" in pnl_query and "1=0" in cash_query and "1=0" in balance_query:
-            #     # print("hello")
-            #     pnl_query="SELECT * FROM pnl"
-            #     balance_query="SELECT * FROM balance_sheet"
-            #     cash_query="SELECT * FROM cash_flow_statement"
+            if "1=0" in pnl_query and "1=0" in cash_query and "1=0" in balance_query:
+                print("hello")
+                pnl_query="SELECT * FROM pnl"
+                balance_query="SELECT * FROM balance_sheet"
+                cash_query="SELECT * FROM cash_flow"
             print("Pnl:", pnl_query)
             print("Balance_Sheet:", balance_query)
             print("Cash_Flow:", cash_query)

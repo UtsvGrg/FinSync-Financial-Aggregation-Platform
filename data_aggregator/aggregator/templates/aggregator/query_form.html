@@ -64,7 +64,7 @@
         .input-group {
             display: flex;
             gap: 1rem;
-            width: 50%;
+            width: 100%;
             align-items: center;
         }
 
@@ -195,7 +195,6 @@
                 <button type="submit" class="submit-btn">Generate Report</button>
             </div>
         </form>
-
         {% if csv_content %}
         <div class="card">
             <h2>Financial Results</h2>
@@ -203,37 +202,17 @@
                 <table class="results-table">
                     <thead>
                         <tr>
-                            <th>Company</th>
-                            <th>Date</th>
-                            <th>Amortization</th>
-                            <th>Cash</th>
-                            <th>Cash Raised (Debt)</th>
-                            <th>Cash Raised (Equity)</th>
-                            <th>Current Liabilities</th>
-                            <th>Ending Cash</th>
-                            <th>Long Term Assets</th>
-                            <th>Net Income</th>
-                            <th>Operating Expenses</th>
-                            <th>Revenue</th>
-                            <th>Taxes</th>
+                            {% for column_name in csv_content.0.keys %} <!-- Use the keys of the first row to dynamically create headers -->
+                            <th>{{ column_name|capfirst }}</th>
+                            {% endfor %}
                         </tr>
                     </thead>
                     <tbody>
                         {% for row in csv_content %}
                         <tr>
-                            <td>{{ row.company_id }}</td>
-                            <td>{{ row.date }}</td>
-                            <td>{{ row.amortization|floatformat:2 }}</td>
-                            <td>{{ row.cash|default_if_none:"-"|floatformat:2 }}</td>
-                            <td>{{ row.cash_raised_spent_on_debt|floatformat:2 }}</td>
-                            <td>{{ row.cash_raised_spent_on_equity|default_if_none:"-"|floatformat:2 }}</td>
-                            <td>{{ row.current_liabilities|default_if_none:"-"|floatformat:2 }}</td>
-                            <td>{{ row.ending_cash|default_if_none:"-"|floatformat:2 }}</td>
-                            <td>{{ row.long_term_assets|floatformat:2 }}</td>
-                            <td>{{ row.net_income|floatformat:2 }}</td>
-                            <td>{{ row.operating_expenses|floatformat:2 }}</td>
-                            <td>{{ row.revenue|floatformat:2 }}</td>
-                            <td>{{ row.taxes|floatformat:2 }}</td>
+                            {% for value in row.values %} <!-- Dynamically render row values -->
+                            <td>{{ value|default_if_none:"-" }}</td>
+                            {% endfor %}
                         </tr>
                         {% endfor %}
                     </tbody>

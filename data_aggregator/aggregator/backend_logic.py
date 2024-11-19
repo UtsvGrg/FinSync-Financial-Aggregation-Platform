@@ -115,7 +115,6 @@ def write_to_csv(data, filename):
     keys = set()
     for item in data:
         keys.update(item.keys())
-    
     keys = ['company_id', 'date'] + sorted(key for key in keys if key not in ['company_id', 'date'])
     
     with open(filename, 'w', newline='') as output_file:
