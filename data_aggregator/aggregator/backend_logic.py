@@ -2,7 +2,42 @@ import requests
 import csv
 from datetime import datetime
 import json
+import os
 from difflib import get_close_matches
+
+config_path = os.path.join('aggregator', 'config.json')
+final_columns = []
+
+def check_container_health():
+    container_urls = {
+        "pnl": "http://localhost:5001/data",
+        "balance_sheet": "http://localhost:5002/data", 
+        "cash_flow_statement": "http://localhost:5003/data"
+    }
+    
+    available_containers = []
+    for container, url in container_urls.items():
+        try:
+            response = requests.get(url)
+            if response.status_code == 200:
+                available_containers.append(container)
+        except:
+            continue
+            
+    print("Available containers: ", available_containers)
+    return available_containers
+
+def get_final_columns():
+    with open(config_path, 'r') as config_file:
+        config = json.load(config_file)
+        
+    available_containers = check_container_health()
+    columns = {'company_id', 'date'} # Always include these
+    
+    for container in available_containers:
+        columns.update(set(config['schema_mapping'][container].values()))
+        
+    return sorted(list(columns))
 
 def generate_queries():
     queries = {
@@ -20,27 +55,39 @@ def federate_queries(queries):
         "cash_flow_statement": "http://localhost:5003/query"
     }
     
+    # Update final_columns with current schema mapping
+    global final_columns
+    final_columns = get_final_columns()
+    print("Final columns obtained:", final_columns)
+
     results = {}
     for data_type, url in container_urls.items():
         query = queries[data_type]
         try:
             response = requests.get(f"{url}?q={query}")
+            response.raise_for_status()  # Raise an exception for bad status codes
             results[data_type] = response.json()
             print(f"Data fetched successfully from {data_type}")
         except requests.RequestException as e:
-            results[data_type] = f"Error: {str(e)}"
             print(f"Error fetching data from {data_type}: {str(e)}")
+            results[data_type] = []  # Empty list instead of error string to allow processing to continue
+        except json.JSONDecodeError as e:
+            print(f"Error decoding JSON from {data_type}: {str(e)}")
+            results[data_type] = []  # Empty list for JSON decode errors
+        except Exception as e:
+            print(f"Unexpected error from {data_type}: {str(e)}")
+            results[data_type] = []  # Empty list for any other errors
     
     return results
 
 def schema_mapping():
-    with open(r'aggregator/config.json', 'r') as config_file:
+    with open(config_path, 'r') as config_file:
         config = json.load(config_file)
     print("Schema mapping loaded from config.json")
     return config['schema_mapping']
 
 def load_company_ids():
-    with open(r'aggregator/config.json', 'r') as config_file:
+    with open(config_path, 'r') as config_file:
         config = json.load(config_file)
     print(f"Loaded {len(config['company_ids'])} valid company IDs from config.json")
     return config['company_ids']
@@ -52,22 +99,24 @@ def find_closest_company_id(company_id, valid_company_ids):
 def aggregate_results(results, schema_map):
     valid_company_ids = load_company_ids()
     aggregated_data = {}
-    
-    for data_type, data in results.items():
-        process_data_type(data_type, data, aggregated_data, schema_map, valid_company_ids)
-    
+    for container_name, data in results.items():
+        process_data_type(container_name, data, aggregated_data, schema_map, valid_company_ids)
     return finalize_aggregated_data(aggregated_data, valid_company_ids)
 
 def process_data_type(data_type, data, aggregated_data, schema_map, valid_company_ids):
     for item in data:
         company_id = process_company_id(item.get('company_id'), valid_company_ids)
+
+        # if company_id != item.get('company_id'):
+        #     print("For container:", data_type, " the company_id is: ", item.get('company_id'), " and the processed company_id is: ", company_id)
+        
         item['company_id']=company_id
+
         if company_id is None:
             continue
         
         if company_id not in aggregated_data:
             aggregated_data[company_id] = {}
-        
         
         process_item(item, company_id, data_type, aggregated_data, schema_map)
 
@@ -104,6 +153,15 @@ def finalize_aggregated_data(aggregated_data, valid_company_ids):
             final_data = {'company_id': company_id}
             final_data.update({key: value_dict['value'] for key, value_dict in aggregated_data[company_id].items()})
             final_aggregated_data.append(final_data)
+
+    # print("Final Aggregated Data: ", final_aggregated_data)
+
+    # Remove items missing any of the required final columns
+    final_aggregated_data = [
+        item for item in final_aggregated_data 
+        if all(col in item for col in final_columns)
+    ]
+    
     print(f"Data aggregated for {len(final_aggregated_data)} companies")
     return final_aggregated_data
 

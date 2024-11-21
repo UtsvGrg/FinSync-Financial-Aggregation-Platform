@@ -45,23 +45,41 @@ def insert_data(cursor, data):
     print("Inserting new data into balance_sheet table...")
     for item in data:
         try:
+            # Validate data types before insertion
+            validated_data = {
+                'company_id': str(item.get('company_id', '')),  # Ensure string
+                'date': str(item.get('date', '')),  # Ensure string
+                'current_assets': float(item.get('current_assets', 0) or 0),  # Convert to float or 0
+                'cash': float(item.get('cash', 0) or 0),
+                'long_term_assets': float(item.get('long_term_assets', 0) or 0),
+                'current_liabilities': float(item.get('current_liabilities', 0) or 0),
+                'long_term_debt': float(item.get('long_term_debt', 0) or 0),
+                'common_stock': float(item.get('common_stock', 0) or 0),
+                'retained_earnings': float(item.get('retained_earnings', 0) or 0)
+            }
+
             cursor.execute('''
-            INSERT INTO balance_sheet (company_id, date, current_assets, cash, long_term_assets, current_liabilities, long_term_debt, common_stock, retained_earnings)
+            INSERT INTO balance_sheet (company_id, date, current_assets, cash, long_term_assets, 
+                                     current_liabilities, long_term_debt, common_stock, retained_earnings)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (
-                item.get('company_id'),
-                item.get('date'),
-                item.get('current_assets'),
-                item.get('cash'),
-                item.get('long_term_assets'),
-                item.get('current_liabilities'),
-                item.get('long_term_debt'),
-                item.get('common_stock'),
-                item.get('retained_earnings')
+                validated_data['company_id'],
+                validated_data['date'],
+                validated_data['current_assets'],
+                validated_data['cash'],
+                validated_data['long_term_assets'],
+                validated_data['current_liabilities'],
+                validated_data['long_term_debt'],
+                validated_data['common_stock'],
+                validated_data['retained_earnings']
             ))
-            print(f"Inserted item: {item}")
+            print(f"Inserted item: {validated_data}")
+        except (ValueError, TypeError) as e:
+            print(f"Data type error in item: {item}. Error: {e}")
+            continue  # Skip this record but continue processing others
         except sqlite3.Error as e:
-            print(f"Error inserting item: {item}. Error: {e}")
+            print(f"Database error inserting item: {item}. Error: {e}")
+            continue
     
     print(f"Inserted {cursor.rowcount} rows into the database.")
 

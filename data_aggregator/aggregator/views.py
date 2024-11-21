@@ -9,7 +9,17 @@ import json
 from django.shortcuts import redirect
 
 def download_csv(request, filename):
-    file_path = os.path.join(r'aggregator\output', filename)
+    '''Working: Downloads a CSV file from the output directory and returns it as an HTTP response.
+    
+    Args:
+        request: The HTTP request object
+        filename: Name of the CSV file to download
+        
+    Returns:
+        HttpResponse: CSV file as attachment if found
+        HttpResponse: 404 error if file not found
+    '''
+    file_path = os.path.join('aggregator', 'output', filename)
     if os.path.exists(file_path):
         with open(file_path, 'rb') as f:
             response = HttpResponse(f.read(), content_type='text/csv')
@@ -17,7 +27,18 @@ def download_csv(request, filename):
             return response
     else:
         return HttpResponse("File not found.", status=404)
+    
 def generate_query(container, form_data, mapping):
+    '''Working: Generates a SQL query based on the form data and mapping.
+    
+    Args:
+        container: Name of the data container (pnl, balance_sheet, cash_flow)
+        form_data: Dictionary of form data
+        mapping: Dictionary of field mappings
+        
+    Returns:
+        str: SQL query
+    '''
     query = f"SELECT * FROM {container} WHERE "
     conditions = []
     for field, mapped_field in mapping[container].items():
@@ -26,12 +47,12 @@ def generate_query(container, form_data, mapping):
             operator = form_data[f'{field}_operator']
             if value is not None and operator:
                 conditions.append(f"{mapped_field} {operator} {value}")
-            #else print("Give Correct Input")    
     if conditions:
         query += " AND ".join(conditions)
     else:
-        query = f"SELECT * FROM {container} WHERE 1=0"
+        query = f"SELECT * FROM {container}"
 
+    # print("For ", container, " the query is: ", query)
     return query    
 
 
@@ -41,6 +62,7 @@ def default_view(request):
 def jaccard_similarity(field1, field2):
     set1 = set(field1.lower())
     set2 = set(field2.lower())
+    # print("For ", field1, " and ", field2, " the jaccard similarity is: ", len(set1 & set2) / len(set1 | set2) if set1 | set2 else 0)
     return len(set1 & set2) / len(set1 | set2) if set1 | set2 else 0
 
 def outer_schema_mapping():
@@ -87,6 +109,7 @@ def outer_schema_mapping():
                     best_match = max(fields, key=lambda f: jaccard_similarity(internal_field, f))
                     if jaccard_similarity(internal_field, best_match) > 0.3: 
                         predefined_mapping[table][internal_field] = best_match                 
+    # print("Predefined Mapping: ", predefined_mapping)
     return predefined_mapping
 
 def query_view(request):
@@ -100,22 +123,24 @@ def query_view(request):
             pnl_query = generate_query("pnl", input_form, field_mapping)
             balance_query = generate_query("balance_sheet", input_form, field_mapping)
             cash_query = generate_query("cash_flow", input_form, field_mapping)
-            print(pnl_query)
+            
+            # If the filters are all None, return the entire database to the user. 
             if "1=0" in pnl_query and "1=0" in cash_query and "1=0" in balance_query:
-                # print("hello")
                 pnl_query="SELECT * FROM pnl"
                 balance_query="SELECT * FROM balance_sheet"
                 cash_query="SELECT * FROM cash_flow"
-            print("Pnl:", pnl_query)
-            print("Balance_Sheet:", balance_query)
-            print("Cash_Flow:", cash_query)
-         
             queries = {
                 "pnl": pnl_query,
                 "balance_sheet": balance_query,
                 "cash_flow_statement": cash_query
             }
+
+            print("Queries: ", queries)
+
             results = federate_queries(queries)
+
+            # print("Federated Results: ", results)
+
             schema_map = schema_mapping()
             aggregated_results = aggregate_results(results, schema_map)
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -130,6 +155,7 @@ def query_view(request):
                 reader = csv.DictReader(csvfile)
                 for row in reader:
                     csv_content.append(row)
+            # print("CSV Content: ", csv_content)
             return render(request, 'aggregator/query_form.html', {
                 'form': form,
                 'csv_content': csv_content,
