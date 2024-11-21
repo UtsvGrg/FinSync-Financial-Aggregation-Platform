@@ -9,6 +9,9 @@ OPERATOR_CHOICES = [
     ('<=', '<='),
 ]
 
+class QueryForm2(forms.Form):
+    llm_search = forms.CharField(label='LLM Query', max_length=100, required=False)
+    
 class QueryForm(forms.Form):
     # Fields with their respective dropdown for operators
     revenue_operator = forms.ChoiceField(choices=OPERATOR_CHOICES, required=False, label='Revenue')

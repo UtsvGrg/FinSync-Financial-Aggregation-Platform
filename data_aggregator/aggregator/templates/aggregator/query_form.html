@@ -182,6 +182,24 @@
         <form method="post" class="card">
             {% csrf_token %}
 
+            {% for field in form2 %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                <div class="input-group">
+                    {{ field }}
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="button-container">
+                <button type="submit" class="submit-btn">LLM Magic</button>
+            </div>
+        </form>
+
+        {% if not flag_var %}
+        <form method="post" class="card">
+            {% csrf_token %}
+
             {% for field in form %}
             <div class="form-group">
                 <label for="{{ field.id_for_label }}">{{ field.label }}</label>
@@ -195,6 +213,8 @@
                 <button type="submit" class="submit-btn">Generate Report</button>
             </div>
         </form>
+        {% endif %}
+        
         {% if csv_content %}
         <div class="card">
             <h2>Financial Results</h2>

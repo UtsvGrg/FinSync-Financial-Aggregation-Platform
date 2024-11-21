@@ -4,6 +4,69 @@ from datetime import datetime
 import json
 import os
 from difflib import get_close_matches
+import google.generativeai as genai
+import os
+import re
+
+def llm_caller(prompt):
+    genai.configure(api_key='AIzaSyDhK6qZPqNKlEgr-oPa6HsasAdYWjrS5_g')
+    model = genai.GenerativeModel("api-key")
+    system_adder = '''I have three data sources balance_sheet, cash_flow and pnl. The schema for each data source is:
+
+    balance_sheet - (company_id, date, current_assets, cash, long_term_assets, current_liabilities, long_term_debt, common_stock, retained_earnings)
+    cash_flow - (company_id, date, beginning_cash, net_income, non_cash_items, depreciation, amortization, change_in_working_capital, cash_raised_spent_on_debt, cash_raised_spent_on_equity, ending_cash) 
+    PNL - (company_id, date, cost_of_goods_sold, operating_expenses, depreciation, amortization, interest_expense, taxes, net_income)
+
+    I am using these data sources to create a Information Integration Application and have used the following schema mapping for each sources. Where keys of each source represent the schema and the value corresponding to it is what the user query on.
+
+        "schema_mapping": {
+        "pnl": {
+            "cost_of_goods_sold": "revenue",
+            "operating_expenses": "operating_expenses",
+            "depreciation": "long_term_assets",
+            "amortization": "amortization",
+            "interest_expense": "cash_raised_spent_on_debt",
+            "taxes": "taxes",
+            "net_income": "net_income"
+        },
+        "balance_sheet": {
+            "current_assets": "ending_cash",
+            "cash": "cash",
+            "long_term_assets": "long_term_assets",
+            "current_liabilities": "current_liabilities",
+            "long_term_debt": "cash_raised_spent_on_debt",
+            "common_stock": "cash_raised_spent_on_equity",
+            "retained_earnings": "net_income"
+        },
+        "cash_flow_statement": {
+            "beginning_cash": "ending_cash",
+            "net_income": "net_income",
+            "non_cash_items": "non_cash_items",
+            "depreciation": "long_term_assets",
+            "amortization": "amortization",
+            "change_in_working_capital": "current_liabilities",
+            "cash_raised_spent_on_debt": "cash_raised_spent_on_debt",
+            "cash_raised_spent_on_equity": "cash_raised_spent_on_equity",
+            "ending_cash": "ending_cash"
+        }
+        }
+
+    Now given a user query generate SQL queries for each data source in the following JSON template without any comments in the JSON:
+    TEMPLATE - {'pnl': 'SELECT * FROM pnl', 'balance_sheet': 'SELECT * FROM balance_sheet', 'cash_flow_statement': 'SELECT * FROM cash_flow'}
+
+    USER QUERY: Generate SQL queries for each sources with its schema in the mentioned template '''
+    response = model.generate_content(system_adder+prompt)
+    print(response.text)
+    pattern = r"```json\n(.*?)```"
+    match = re.search(pattern, response.text, re.DOTALL) 
+
+    if match: 
+        json_output = match.group(1) 
+        return json.loads(json_output)
+    
+    else: 
+        print("No JSON found.")
+        return None
 
 config_path = os.path.join('aggregator', 'config.json')
 final_columns = []

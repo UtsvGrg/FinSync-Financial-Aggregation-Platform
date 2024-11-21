@@ -1,32 +1,12 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
-from .forms import QueryForm
-from .backend_logic import federate_queries, schema_mapping, aggregate_results, write_to_csv
+from .forms import QueryForm, QueryForm2
+from .backend_logic import federate_queries, schema_mapping, aggregate_results, write_to_csv, llm_caller
 import os
 from datetime import datetime
 import csv
 import json
 from django.shortcuts import redirect
-
-def download_csv(request, filename):
-    '''Working: Downloads a CSV file from the output directory and returns it as an HTTP response.
-    
-    Args:
-        request: The HTTP request object
-        filename: Name of the CSV file to download
-        
-    Returns:
-        HttpResponse: CSV file as attachment if found
-        HttpResponse: 404 error if file not found
-    '''
-    file_path = os.path.join('aggregator', 'output', filename)
-    if os.path.exists(file_path):
-        with open(file_path, 'rb') as f:
-            response = HttpResponse(f.read(), content_type='text/csv')
-            response['Content-Disposition'] = f'attachment; filename="{filename}"'
-            return response
-    else:
-        return HttpResponse("File not found.", status=404)
     
 def generate_query(container, form_data, mapping):
     '''Working: Generates a SQL query based on the form data and mapping.
@@ -115,40 +95,49 @@ def outer_schema_mapping():
 def query_view(request):
     if request.method == 'POST':
         form = QueryForm(request.POST)
-        if form.is_valid():
+        form2 = QueryForm2(request.POST)
+
+        if form.is_valid() and form2.is_valid():
+
             input_form = {field: form.cleaned_data[field] for field in form.cleaned_data}
-            #print(input_form)
+            input_form2 = {field: form2.cleaned_data[field] for field in form2.cleaned_data}
+
             field_mapping = outer_schema_mapping()
-            #print("Field Mapping: ",field_mapping)
+
             pnl_query = generate_query("pnl", input_form, field_mapping)
             balance_query = generate_query("balance_sheet", input_form, field_mapping)
             cash_query = generate_query("cash_flow", input_form, field_mapping)
             
-            # If the filters are all None, return the entire database to the user. 
-            if "1=0" in pnl_query and "1=0" in cash_query and "1=0" in balance_query:
-                pnl_query="SELECT * FROM pnl"
-                balance_query="SELECT * FROM balance_sheet"
-                cash_query="SELECT * FROM cash_flow"
             queries = {
                 "pnl": pnl_query,
                 "balance_sheet": balance_query,
                 "cash_flow_statement": cash_query
             }
 
-            print("Queries: ", queries)
+            flag_var = False
 
-            results = federate_queries(queries)
+            if input_form2['llm_search']!="":
+                flag_var = True
+                queries = llm_caller(input_form2['llm_search'])
 
-            # print("Federated Results: ", results)
+            if queries!=None:
+                print("Queries: ", queries)
 
-            schema_map = schema_mapping()
-            aggregated_results = aggregate_results(results, schema_map)
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"aggregated_results_{timestamp}.csv"
-            output_path = os.path.join(r'aggregator/output', filename)
-            if write_to_csv(aggregated_results, output_path) == None:
+                results = federate_queries(queries)
+
+                # print("Federated Results: ", results)
+
+                schema_map = schema_mapping()
+                aggregated_results = aggregate_results(results, schema_map)
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                filename = f"aggregated_results_{timestamp}.csv"
+                output_path = os.path.join(r'aggregator/output', filename)
+                if write_to_csv(aggregated_results, output_path) == None:
+                    output_path = os.path.join(r'aggregator/output', 'aggregated_results_empty.csv')
+                    print(output_path)
+            
+            else:
                 output_path = os.path.join(r'aggregator/output', 'aggregated_results_empty.csv')
-                print(output_path)
 
             csv_content = []
             with open(output_path, newline='') as csvfile:
@@ -158,11 +147,14 @@ def query_view(request):
             # print("CSV Content: ", csv_content)
             return render(request, 'aggregator/query_form.html', {
                 'form': form,
+                'form2': form2,
+                'flag_var': flag_var,
                 'csv_content': csv_content,
                 'headers': reader.fieldnames  # for table headers
             })
 
     else:
         form = QueryForm()
+        form2 = QueryForm2()
 
-    return render(request, 'aggregator/query_form.html', {'form': form})
+    return render(request, 'aggregator/query_form.html', {'form': form, 'form2': form2})
