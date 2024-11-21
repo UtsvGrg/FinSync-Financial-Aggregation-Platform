@@ -9,8 +9,8 @@ import os
 import re
 
 def llm_caller(prompt):
-    genai.configure(api_key='AIzaSyDhK6qZPqNKlEgr-oPa6HsasAdYWjrS5_g')
-    model = genai.GenerativeModel("api-key")
+    genai.configure(api_key='api-key')
+    model = genai.GenerativeModel("gemini-1.5-pro")
     system_adder = '''I have three data sources balance_sheet, cash_flow and pnl. The schema for each data source is:
 
     balance_sheet - (company_id, date, current_assets, cash, long_term_assets, current_liabilities, long_term_debt, common_stock, retained_earnings)
