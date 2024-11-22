@@ -27,7 +27,6 @@
         "change_in_working_capital": "current_liabilities",
         "cash_raised_spent_on_debt": "cash_raised_spent_on_debt",
         "cash_raised_spent_on_equity": "cash_raised_spent_on_equity",
-        "ending_cash": "ending_cash"
       }
     },
 
