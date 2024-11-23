@@ -11,16 +11,15 @@ import re
 def llm_caller(prompt):
     genai.configure(api_key='api-key')
     model = genai.GenerativeModel("gemini-1.5-pro")
-    system_adder = '''I have three data sources balance_sheet, cash_flow and pnl. The schema for each data source is:
+    system_adder = '''I have three data sources balance_sheet, cash_flow and pnl. The schema for the data sources are:
 
-    balance_sheet - (company_id, date, current_assets, cash, long_term_assets, current_liabilities, long_term_debt, common_stock, retained_earnings)
-    cash_flow - (company_id, date, beginning_cash, net_income, non_cash_items, depreciation, amortization, change_in_working_capital, cash_raised_spent_on_debt, cash_raised_spent_on_equity, ending_cash) 
-    PNL - (company_id, date, cost_of_goods_sold, operating_expenses, depreciation, amortization, interest_expense, taxes, net_income)
+    SCHEMA of pnl - (company_id, date, cost_of_goods_sold, operating_expenses, depreciation, amortization, interest_expense, taxes, net_income)
+    SCHEMA of balance_sheet - (company_id, date, current_assets, cash, long_term_assets, current_liabilities, long_term_debt, common_stock, retained_earnings)
+    SCHEMA of cash_flow - (company_id, date, beginning_cash, net_income, non_cash_items, depreciation, amortization, change_in_working_capital, cash_raised_spent_on_debt, cash_raised_spent_on_equity, ending_cash) 
 
-    I am using these data sources to create a Information Integration Application and have used the following schema mapping for each sources. Where keys of each source represent the schema and the value corresponding to it is what the user query on.
+    I am using these data sources to create a Information Integration Application and have used the following schema mapping for each sources. Where keys of each source represent the SCHEMA and the value corresponding to the key is what the USER QUERY on.
 
-        "schema_mapping": {
-        "pnl": {
+    SCHEMA MAPPING of pnl : {
             "cost_of_goods_sold": "revenue",
             "operating_expenses": "operating_expenses",
             "depreciation": "long_term_assets",
@@ -28,8 +27,9 @@ def llm_caller(prompt):
             "interest_expense": "cash_raised_spent_on_debt",
             "taxes": "taxes",
             "net_income": "net_income"
-        },
-        "balance_sheet": {
+        }
+
+    SCHEMA MAPPING of balance_sheet: {
             "current_assets": "ending_cash",
             "cash": "cash",
             "long_term_assets": "long_term_assets",
@@ -37,8 +37,9 @@ def llm_caller(prompt):
             "long_term_debt": "cash_raised_spent_on_debt",
             "common_stock": "cash_raised_spent_on_equity",
             "retained_earnings": "net_income"
-        },
-        "cash_flow_statement": {
+        }
+
+    SCHEMA MAPPING of cash_flow: {
             "beginning_cash": "ending_cash",
             "net_income": "net_income",
             "non_cash_items": "non_cash_items",
@@ -46,15 +47,15 @@ def llm_caller(prompt):
             "amortization": "amortization",
             "change_in_working_capital": "current_liabilities",
             "cash_raised_spent_on_debt": "cash_raised_spent_on_debt",
-            "cash_raised_spent_on_equity": "cash_raised_spent_on_equity",
-            "ending_cash": "ending_cash"
-        }
+            "cash_raised_spent_on_equity": "cash_raised_spent_on_equity"
         }
 
-    Now given a user query generate SQL queries for each data source in the following JSON template without any comments in the JSON:
-    TEMPLATE - {'pnl': 'SELECT * FROM pnl', 'balance_sheet': 'SELECT * FROM balance_sheet', 'cash_flow_statement': 'SELECT * FROM cash_flow'}
+    Now given a USER QUERY generate SQL queries for each data source in the following JSON template without any comments in the JSON:
+    
+    EXAMPLE QUERY: Generate SQL queries for pnl, balance_sheet and cash_flow corresponding to its SCHEMA for companies with ending cash greater than 1 lakh 10 thousand
+    EXAMPLE ANSWER TEMPLATE - {'pnl': 'SELECT * FROM pnl', 'balance_sheet': 'SELECT * FROM balance_sheet WHERE current_assets > 110000', 'cash_flow_statement': 'SELECT * FROM cash_flow WHERE beginning_cash > 110000'}
 
-    USER QUERY: Generate SQL queries for each sources with its schema in the mentioned template '''
+    USER QUERY: Generate SQL queries for each sources with its schema in the mentioned template for'''
     response = model.generate_content(system_adder+prompt)
     print(response.text)
     pattern = r"```json\n(.*?)```"
