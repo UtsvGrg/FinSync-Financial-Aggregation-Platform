@@ -29,7 +29,6 @@ FinSync is an enterprise financial data integration platform that aggregates and
 
 - [FinSync-Financial-Aggregation-Platform](#finsync-financial-aggregation-platform)
   - [Table of Contents](#table-of-contents)
-  - [Introduction](#introduction)
     - [Docker Setup](#docker-setup)
     - [Local Environment](#local-environment)
     - [Dependencies](#dependencies)
@@ -41,37 +40,17 @@ FinSync is an enterprise financial data integration platform that aggregates and
     - [pytest](#pytest)
   - [Project Structure](#project-structure)
   - [Continuous Integration](#continuous-integration)
-  - [Contributing](#contributing)
-  - [License](#license)
   - [System Architecture](#system-architecture)
   - [API Documentation](#api-documentation)
     - [Endpoints](#endpoints)
     - [Query Parameters](#query-parameters)
-  - [Error Handling](#error-handling)
   - [Performance Considerations](#performance-considerations)
+  - [Error Handling](#error-handling)
   - [Security](#security)
   - [Configuration](#configuration)
     - [Sample config.json](#sample-configjson)
-  - [Troubleshooting](#troubleshooting)
 
 
-## Introduction
-
-
-**FinSync-Financial-Aggregation-Platform** is an enterprise-grade financial data integration platform that tracks and consolidates financial operations across multiple sources. The system:
-
-
-- Aggregates data from bank statements, cash flow statements, and balance sheets
-- Processes three main financial statements:
-  - Profit & Loss (PNL)
-  - Balance Sheet
-  - Cash Flow Statement
-- Provides real-time data validation and correction
-- Outputs standardized financial reports
-- Supports both API and CSV-based data access
-
-
-The platform uses a microservices architecture with separate containers for each financial data source, ensuring scalability and maintainability.
 ### Docker Setup
 
 
@@ -226,18 +205,6 @@ Each service has its own directory under `data_sources/` containing:
 This project uses GitHub Actions for CI. The pipeline runs on every push and pull request, performing code formatting checks, linting, and running tests.
 
 
-## Contributing
-
-
-Contributions are welcome! Please fork the repository and create a pull request with your changes.
-
-
-## License
-
-
-This project is licensed under the MIT License.
-
-
 ## System Architecture
 
 
@@ -292,8 +259,17 @@ This project is licensed under the MIT License.
 
 ### Query Parameters
 - `q`: SQL query string (required)
-- `company_id`: Filter by company ID (optional)
-- `date_range`: Filter by date range (optional)
+
+
+
+## Performance Considerations
+
+
+- **Supports concurrent processing of multiple data sources**
+- **Implements caching for frequently accessed data**
+- **Optimizes query execution through federation**
+- **Handles large datasets through pagination**
+- **Uses connection pooling for database operations**
 
 
 ## Error Handling
@@ -305,17 +281,6 @@ The system implements robust error handling for:
 - Schema mapping errors
 - Data type mismatches
 - Query execution failures
-
-
-## Performance Considerations
-
-
-- Supports concurrent processing of multiple data sources
-- Implements caching for frequently accessed data
-- Optimizes query execution through federation
-- Handles large datasets through pagination
-- Uses connection pooling for database operations
-
 
 ## Security
 
@@ -347,30 +312,4 @@ The system implements robust error handling for:
 }
 ```
 
-
-## Troubleshooting
-
-
-Common issues and solutions:
-1. **Container Connection Failures**
-   - Verify all containers are running
-   - Check network configuration
-   - Ensure correct ports are exposed
-
-
-2. **Data Aggregation Issues**
-   - Validate company IDs in config.json
-   - Check schema mapping configuration
-   - Verify data types in source systems
-
-
-3. **Performance Issues**
-   - Monitor container resources
-   - Check query optimization
-   - Verify connection pooling settings
-
-
----
-
-
-
+Made with ❤️ by [Utsav Garg](https://github.com/UtsvGrg), [Sameer Gupta](https://github.com/guptasameer112), [Vipul Garg](https://github.com/vipul22577)

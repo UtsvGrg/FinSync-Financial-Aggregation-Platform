@@ -31,22 +31,42 @@ def insert_data_from_json(cursor, json_file):
 
     # Insert new data
     for item in data:
-        cursor.execute('''
-        INSERT INTO cash_flow (company_id, date, beginning_cash, net_income, non_cash_items, depreciation, amortization, change_in_working_capital, cash_raised_spent_on_debt, cash_raised_spent_on_equity, ending_cash)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            item.get('company_id'),
-            item.get('date'),
-            item.get('beginning_cash'),
-            item.get('net_income'),
-            item.get('non_cash_items'),
-            item.get('depreciation'),
-            item.get('amortization'),
-            item.get('change_in_working_capital'),
-            item.get('cash_raised_spent_on_debt'),
-            item.get('cash_raised_spent_on_equity'),
-            item.get('ending_cash')
-        ))
+        try:
+            # Validate data types before insertion
+            validated_data = {
+                'company_id': str(item.get('company_id', '')),  # Ensure string
+                'date': str(item.get('date', '')),  # Ensure string
+                'beginning_cash': float(item.get('beginning_cash', 0)),  # Ensure float
+                'net_income': float(item.get('net_income', 0)),
+                'non_cash_items': float(item.get('non_cash_items', 0)),
+                'depreciation': float(item.get('depreciation', 0)),
+                'amortization': float(item.get('amortization', 0)),
+                'change_in_working_capital': float(item.get('change_in_working_capital', 0)),
+                'cash_raised_spent_on_debt': float(item.get('cash_raised_spent_on_debt', 0)),
+                'cash_raised_spent_on_equity': float(item.get('cash_raised_spent_on_equity', 0)),
+                'ending_cash': float(item.get('ending_cash', 0))
+            }
+
+            cursor.execute('''
+            INSERT INTO cash_flow (company_id, date, beginning_cash, net_income, non_cash_items, depreciation, amortization, change_in_working_capital, cash_raised_spent_on_debt, cash_raised_spent_on_equity, ending_cash)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                validated_data['company_id'],
+                validated_data['date'], 
+                validated_data['beginning_cash'],
+                validated_data['net_income'],
+                validated_data['non_cash_items'],
+                validated_data['depreciation'],
+                validated_data['amortization'],
+                validated_data['change_in_working_capital'],
+                validated_data['cash_raised_spent_on_debt'],
+                validated_data['cash_raised_spent_on_equity'],
+                validated_data['ending_cash']
+            ))
+        except (ValueError, TypeError) as e:
+            print(f"Error validating data for company {item.get('company_id')}: {e}")
+            continue
+            
     print("Data inserted successfully.")
 
 def main():

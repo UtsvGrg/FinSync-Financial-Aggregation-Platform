@@ -24,23 +24,41 @@ def insert_data_from_json(cursor, json_file):
     # Clear existing data
     cursor.execute('DELETE FROM pnl')
     print("Existing data cleared.")
-    
+
     # Insert new data
     for item in data:
-        cursor.execute('''
-        INSERT INTO pnl (company_id, date, cost_of_goods_sold, operating_expenses, depreciation, amortization, interest_expense, taxes, net_income)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            item.get('company_id'),
-            item.get('date'),
-            item.get('cost_of_goods_sold'),
-            item.get('operating_expenses'),
-            item.get('depreciation'),
-            item.get('amortization'),
-            item.get('interest_expense'),
-            item.get('taxes'),
-            item.get('net_income')
-        ))
+        try:
+            # Validate data types before insertion
+            validated_data = {
+                'company_id': str(item.get('company_id', '')),  # Ensure string
+                'date': str(item.get('date', '')),  # Ensure string
+                'cost_of_goods_sold': float(item.get('cost_of_goods_sold', 0)),  # Ensure float
+                'operating_expenses': float(item.get('operating_expenses', 0)),
+                'depreciation': float(item.get('depreciation', 0)),
+                'amortization': float(item.get('amortization', 0)), 
+                'interest_expense': float(item.get('interest_expense', 0)),
+                'taxes': float(item.get('taxes', 0)),
+                'net_income': float(item.get('net_income', 0))
+            }
+
+            cursor.execute('''
+            INSERT INTO pnl (company_id, date, cost_of_goods_sold, operating_expenses, depreciation, amortization, interest_expense, taxes, net_income)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                validated_data['company_id'],
+                validated_data['date'],
+                validated_data['cost_of_goods_sold'],
+                validated_data['operating_expenses'], 
+                validated_data['depreciation'],
+                validated_data['amortization'],
+                validated_data['interest_expense'],
+                validated_data['taxes'],
+                validated_data['net_income']
+            ))
+        except (ValueError, TypeError) as e:
+            print(f"Error validating data for company {item.get('company_id')}: {e}")
+            continue
+            
     print("Data inserted successfully.")
 
 def main():
