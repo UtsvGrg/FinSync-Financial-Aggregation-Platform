@@ -238,6 +238,36 @@
                     </tbody>
                 </table>
             </div>
+            <hr>
+            <form method="post">
+                {% csrf_token %}
+
+                {% for field in form3 %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    <div class="input-group">
+                        {{ field }}
+                    </div>
+                </div>
+                {% endfor %}
+
+                <div class="button-container">
+                    <input type="hidden" name="llm_analysis" value="true">
+                    <button type="submit" class="submit-btn">Generate Insights</button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+        {% if analysis_result %}
+        <div class="card">
+            <div class="card-header">
+                <h2>LLM Analysis Results</h2>
+            </div>
+            <div class="card-body">
+                <div class="analysis-result">
+                    {{ analysis_result|safe}}
+                </div>
+            </div>
         </div>
         {% endif %}
     </div>

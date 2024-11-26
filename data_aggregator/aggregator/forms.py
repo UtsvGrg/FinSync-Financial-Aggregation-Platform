@@ -9,6 +9,16 @@ OPERATOR_CHOICES = [
     ('<=', '<='),
 ]
 
+OPTION_CHOICES = [
+    ('', ''),
+    ('Top 3 most valuable companies', 'Top 3 most valuable companies'),
+    ('Top 3 companies with highest profit in the quater', 'Top 3 companies with highest profit in the quater'),
+    ('Top 3 companies with highest liquid assets', 'Top 3 companies with highest liquid assets'),
+]
+
+class QueryForm3(forms.Form):
+    analysis_option = forms.ChoiceField(choices=OPTION_CHOICES, required=False, label='Analysis Options')
+
 class QueryForm2(forms.Form):
     llm_search = forms.CharField(label='LLM Query', max_length=250, required=False)
     

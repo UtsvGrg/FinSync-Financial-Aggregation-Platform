@@ -8,8 +8,15 @@ import google.generativeai as genai
 import os
 import re
 
+def llm_caller2(prompt):
+    genai.configure(api_key='AIzaSyDkBTAQmwJLA4omqfRp2DVVtzd56fKqtek')
+    model = genai.GenerativeModel("gemini-1.5-pro")
+    response = model.generate_content(prompt)
+    print(response.text)
+    return response.text
+
 def llm_caller(prompt):
-    genai.configure(api_key='api-key')
+    genai.configure(api_key='AIzaSyDkBTAQmwJLA4omqfRp2DVVtzd56fKqtek')
     model = genai.GenerativeModel("gemini-1.5-pro")
     system_adder = '''I have three data sources balance_sheet, cash_flow and pnl. The schema for the data sources are:
 

@@ -1,11 +1,9 @@
 from django.shortcuts import render
-from django.http import JsonResponse, HttpResponse
-from .forms import QueryForm, QueryForm2
-from .backend_logic import federate_queries, schema_mapping, aggregate_results, write_to_csv, llm_caller
+from .forms import QueryForm, QueryForm2, QueryForm3
+from .backend_logic import federate_queries, schema_mapping, aggregate_results, write_to_csv, llm_caller, llm_caller2
 import os
 from datetime import datetime
 import csv
-import json
 from django.shortcuts import redirect
     
 def generate_query(container, form_data, mapping):
@@ -37,6 +35,9 @@ def generate_query(container, form_data, mapping):
 
 
 def default_view(request):
+    llm_caller('Companies with amortization value greater than 1 lakh 10 thousand') 
+    llm_caller('Companies with amortization greater than 1 lakh 10 thousand and current liabilities less than 26k')
+    llm_caller('companies with operating expenses greater than 2500000.0')
     return redirect('/query/')
 
 def jaccard_similarity(field1, field2):
@@ -96,11 +97,13 @@ def query_view(request):
     if request.method == 'POST':
         form = QueryForm(request.POST)
         form2 = QueryForm2(request.POST)
+        form3 = QueryForm3(request.POST)
 
-        if form.is_valid() and form2.is_valid():
+        if form.is_valid() and form2.is_valid() and form3.is_valid():
 
             input_form = {field: form.cleaned_data[field] for field in form.cleaned_data}
             input_form2 = {field: form2.cleaned_data[field] for field in form2.cleaned_data}
+            input_form3 = {field: form3.cleaned_data[field] for field in form3.cleaned_data}
 
             field_mapping = outer_schema_mapping()
 
@@ -144,17 +147,29 @@ def query_view(request):
                 reader = csv.DictReader(csvfile)
                 for row in reader:
                     csv_content.append(row)
-            # print("CSV Content: ", csv_content)
+
+            analysis_result = None
+            if request.POST.get('llm_analysis') == 'true':
+                final_prompt = repr(aggregated_results) 
+                final_prompt += 'This is a csv data of companies in the form of list, comment on' 
+                final_prompt += input_form3['analysis_option']
+                final_prompt += 'and why?. All in just one paragraph'
+                analysis_result = llm_caller2(final_prompt)
+
             return render(request, 'aggregator/query_form.html', {
                 'form': form,
                 'form2': form2,
+                'form3': form3,
                 'flag_var': flag_var,
                 'csv_content': csv_content,
+                'analysis_result': analysis_result,
                 'headers': reader.fieldnames  # for table headers
+
             })
 
     else:
         form = QueryForm()
         form2 = QueryForm2()
+        form3 = QueryForm3()
 
-    return render(request, 'aggregator/query_form.html', {'form': form, 'form2': form2})
+    return render(request, 'aggregator/query_form.html', {'form': form, 'form2': form2, 'form3': form3})
