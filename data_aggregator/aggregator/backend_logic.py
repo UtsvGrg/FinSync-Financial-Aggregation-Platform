@@ -9,14 +9,14 @@ import os
 import re
 
 def llm_caller2(prompt):
-    genai.configure(api_key='AIzaSyDkBTAQmwJLA4omqfRp2DVVtzd56fKqtek')
+    genai.configure(api_key='AIzaSyC0Dipt4FgxYTF5-a2_FmSbRYeMRsrVzvE')
     model = genai.GenerativeModel("gemini-1.5-pro")
     response = model.generate_content(prompt)
     print(response.text)
     return response.text
 
 def llm_caller(prompt):
-    genai.configure(api_key='AIzaSyDkBTAQmwJLA4omqfRp2DVVtzd56fKqtek')
+    genai.configure(api_key='AIzaSyC0Dipt4FgxYTF5-a2_FmSbRYeMRsrVzvE')
     model = genai.GenerativeModel("gemini-1.5-pro")
     system_adder = '''I have three data sources balance_sheet, cash_flow and pnl. The schema for the data sources are:
 
@@ -280,55 +280,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
-
-
-
-# <--------------------------------------------- After django is running --------------------------------------------->
-
-# # main.py
-# from operations.django_handler import process_frontend_data, send_results_to_frontend
-# from operations.query_federation import generate_queries, federate_queries
-# from operations.data_aggregation import aggregate_results
-# import json
-
-# def main(frontend_data):
-#     print("Starting data aggregation process...")
-    
-#     # Process frontend data
-#     processed_data = process_frontend_data(frontend_data)
-    
-#     # Generate and federate queries
-#     queries = generate_queries(processed_data)
-#     results = federate_queries(queries)
-    
-#     # Load schema mapping
-#     with open('config.json', 'r') as config_file:
-#         config = json.load(config_file)
-#     schema_map = config['schema_mapping']
-    
-#     # Aggregate results
-#     aggregated_results = aggregate_results(results, schema_map)
-    
-#     # Send results back to frontend
-#     send_results_to_frontend(aggregated_results)
-    
-#     print("Data aggregation process completed.")
-
-# if __name__ == "__main__":
-#     # This is just for testing purposes
-#     # In a real Django app, this would be called by a view
-#     sample_frontend_data = {
-#         "cogs_threshold": 150000,
-#         "assets_threshold": 75000,
-#         "cash_threshold": 120000
-#     }
-#     main(sample_frontend_data)

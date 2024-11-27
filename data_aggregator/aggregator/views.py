@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .forms import QueryForm, QueryForm2, QueryForm3
+from .forms import QueryForm
 from .backend_logic import federate_queries, schema_mapping, aggregate_results, write_to_csv, llm_caller, llm_caller2
 import os
 from datetime import datetime
@@ -35,15 +35,14 @@ def generate_query(container, form_data, mapping):
 
 
 def default_view(request):
-    llm_caller('Companies with amortization value greater than 1 lakh 10 thousand') 
-    llm_caller('Companies with amortization greater than 1 lakh 10 thousand and current liabilities less than 26k')
-    llm_caller('companies with operating expenses greater than 2500000.0')
+    # llm_caller('Companies with amortization value greater than 1 lakh 10 thousand') 
+    # llm_caller('Companies with amortization greater than 1 lakh 10 thousand and current liabilities less than 26k')
+    # llm_caller('companies with operating expenses greater than 2500000.0')
     return redirect('/query/')
 
 def jaccard_similarity(field1, field2):
     set1 = set(field1.lower())
     set2 = set(field2.lower())
-    # print("For ", field1, " and ", field2, " the jaccard similarity is: ", len(set1 & set2) / len(set1 | set2) if set1 | set2 else 0)
     return len(set1 & set2) / len(set1 | set2) if set1 | set2 else 0
 
 def outer_schema_mapping():
@@ -51,25 +50,25 @@ def outer_schema_mapping():
         "pnl": {
             "revenue": "cost_of_goods_sold",
             "operating_expenses": "operating_expenses",
+            "long_term_assets": "depreciation",
             "amortization": "amortization",
-            "net_income": "net_cash_amount",
             "cash_raised_spent_on_debt": "interest_expense",
             "taxes": "taxes",
-            "long_term_assets": "depreciation"
+            "net_income": "net_income"
             
         },
         "balance_sheet": {
             "ending_cash": "current_assets",
-            "cash": "cash_on_hand",
-            "current_liabilities": "current_liabilities",
+            "cash": "cash",
             "long_term_assets": "long_term_assets",
+            "current_liabilities": "current_liabilities",
             "cash_raised_spent_on_debt": "long_term_debt",
             "cash_raised_spent_on_equity": "common_stock",
             "net_income": "retained_earnings"
         },
         "cash_flow": {
             "ending_cash": "beginning_cash",
-            "net_income": "net_cash",
+            "net_income": "net_income",
             "non_cash_items": "non_cash_items",
             "long_term_assets": "depreciation",
             "amortization": "amortization",
@@ -81,7 +80,7 @@ def outer_schema_mapping():
     external_schema = {
         "pnl": ["cost_of_goods_sold","depreciation","operating_expenses","amortization", "net_income", "interest_expense","taxes"],
         "balance_sheet": ["current_assets", "cash", "current_liabilities","long_term_assets","long_term_debt","common_stock","retained_earnings"],
-        "cash_flow": ["net_income", "non_cash_expenses","cash_raised_spent_on_equity", "cash_raised_spent_on_debt","change_in_working_capital","beginning_cash", "depreciation","amortization"]
+        "cash_flow": ["beginning_cash","net_income", "non_cash_items","depreciation","amortization","change_in_working_capital", "cash_raised_spent_on_debt", "cash_raised_spent_on_equity"]
     }
     for table, fields in external_schema.items():
         if table in predefined_mapping:
@@ -90,20 +89,16 @@ def outer_schema_mapping():
                     best_match = max(fields, key=lambda f: jaccard_similarity(internal_field, f))
                     if jaccard_similarity(internal_field, best_match) > 0.3: 
                         predefined_mapping[table][internal_field] = best_match                 
-    # print("Predefined Mapping: ", predefined_mapping)
     return predefined_mapping
 
 def query_view(request):
     if request.method == 'POST':
         form = QueryForm(request.POST)
-        form2 = QueryForm2(request.POST)
-        form3 = QueryForm3(request.POST)
 
-        if form.is_valid() and form2.is_valid() and form3.is_valid():
+        if form.is_valid(): 
 
             input_form = {field: form.cleaned_data[field] for field in form.cleaned_data}
-            input_form2 = {field: form2.cleaned_data[field] for field in form2.cleaned_data}
-            input_form3 = {field: form3.cleaned_data[field] for field in form3.cleaned_data}
+            print(input_form)
 
             field_mapping = outer_schema_mapping()
 
@@ -119,16 +114,13 @@ def query_view(request):
 
             flag_var = False
 
-            if input_form2['llm_search']!="":
+            if input_form['llm_search']!="":
                 flag_var = True
-                queries = llm_caller(input_form2['llm_search'])
+                queries = llm_caller(input_form['llm_search'])
 
             if queries!=None:
                 print("Queries: ", queries)
-
                 results = federate_queries(queries)
-
-                # print("Federated Results: ", results)
 
                 schema_map = schema_mapping()
                 aggregated_results = aggregate_results(results, schema_map)
@@ -149,18 +141,17 @@ def query_view(request):
                     csv_content.append(row)
 
             analysis_result = None
-            if request.POST.get('llm_analysis') == 'true':
+            print("INPUT", input_form['analysis_option'])
+            if request.POST.get('llm_analysis') == 'true' and input_form['analysis_option']!='':
+                print(aggregated_results)
                 final_prompt = repr(aggregated_results) 
                 final_prompt += 'This is a csv data of companies in the form of list, comment on' 
-                final_prompt += input_form3['analysis_option']
+                final_prompt += input_form['analysis_option']
                 final_prompt += 'and why?. All in just one paragraph'
                 analysis_result = llm_caller2(final_prompt)
 
             return render(request, 'aggregator/query_form.html', {
                 'form': form,
-                'form2': form2,
-                'form3': form3,
-                'flag_var': flag_var,
                 'csv_content': csv_content,
                 'analysis_result': analysis_result,
                 'headers': reader.fieldnames  # for table headers
@@ -169,7 +160,5 @@ def query_view(request):
 
     else:
         form = QueryForm()
-        form2 = QueryForm2()
-        form3 = QueryForm3()
 
-    return render(request, 'aggregator/query_form.html', {'form': form, 'form2': form2, 'form3': form3})
+    return render(request, 'aggregator/query_form.html', {'form': form, })

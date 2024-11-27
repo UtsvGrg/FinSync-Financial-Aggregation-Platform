@@ -16,13 +16,16 @@ OPTION_CHOICES = [
     ('Top 3 companies with highest liquid assets', 'Top 3 companies with highest liquid assets'),
 ]
 
-class QueryForm3(forms.Form):
-    analysis_option = forms.ChoiceField(choices=OPTION_CHOICES, required=False, label='Analysis Options')
+# class QueryForm3(forms.Form):
+#     analysis_option = forms.ChoiceField(choices=OPTION_CHOICES, required=False, label='Analysis Options')
 
-class QueryForm2(forms.Form):
-    llm_search = forms.CharField(label='LLM Query', max_length=250, required=False)
+# class QueryForm2(forms.Form):
+#     llm_search = forms.CharField(label='LLM Query', max_length=250, required=False)
     
 class QueryForm(forms.Form):
+
+    llm_search = forms.CharField(label='LLM Query', max_length=250, required=False)
+
     # Fields with their respective dropdown for operators
     revenue_operator = forms.ChoiceField(choices=OPERATOR_CHOICES, required=False, label='Revenue')
     revenue = forms.IntegerField(label='', required=False)
@@ -59,3 +62,6 @@ class QueryForm(forms.Form):
     
     non_cash_items_operator = forms.ChoiceField(choices=OPERATOR_CHOICES, required=False, label='Non-Cash Items')
     non_cash_items = forms.IntegerField(label='', required=False)
+
+    analysis_option = forms.ChoiceField(choices=OPTION_CHOICES, required=False, label='Analysis Options')
+

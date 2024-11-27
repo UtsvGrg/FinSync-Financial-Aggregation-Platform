@@ -182,38 +182,164 @@
         <form method="post" class="card">
             {% csrf_token %}
 
-            {% for field in form2 %}
             <div class="form-group">
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                <label for="id_llm_search">LLM Query</label>
                 <div class="input-group">
-                    {{ field }}
+                    {{ form.llm_search }}
                 </div>
             </div>
-            {% endfor %}
 
             <div class="button-container">
-                <button type="submit" class="submit-btn">LLM Magic</button>
+                <button type="submit" class="submit-btn">Filter Magic</button>
             </div>
-        </form>
 
-        {% if not flag_var %}
-        <form method="post" class="card">
-            {% csrf_token %}
-
-            {% for field in form %}
             <div class="form-group">
-                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                <label for="id_revenue_operator">Revenue</label>
                 <div class="input-group">
-                    {{ field }}
+                    {{ form.revenue_operator }}
                 </div>
             </div>
-            {% endfor %}
+            <div class="form-group">
+                <div class="input-group">
+                    {{ form.revenue }}
+                </div>
+            </div>
+        
+            <div class="form-group">
+                <label for="id_operating_expenses">Operating Expenses</label>
+                <div class="input-group">
+                    {{ form.operating_expenses_operator }}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    {{ form.operating_expenses }}
+                </div>
+            </div>
+        
+            <div class="form-group">
+                <label for="id_long_term_assets">Long-term Assets</label>
+                <div class="input-group">
+                    {{ form.long_term_assets_operator }}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    {{ form.long_term_assets }}
+                </div>
+            </div>
+        
+            <div class="form-group">
+                <label for="id_amortization">Amortization</label>
+                <div class="input-group">
+                    {{ form.amortization_operator }}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    {{ form.amortization }}
+                </div>
+            </div>
+        
+            <div class="form-group">
+                <label for="id_cash_raised_spent_on_debt">Cash Raised/Spent on Debt</label>
+                <div class="input-group">
+                    {{ form.cash_raised_spent_on_debt_operator }}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    {{ form.cash_raised_spent_on_debt }}
+                </div>
+            </div>
+        
+            <div class="form-group">
+                <label for="id_taxes">Taxes</label>
+                <div class="input-group">
+                    {{ form.taxes_operator }}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    {{ form.taxes }}
+                </div>
+            </div>
+        
+            <div class="form-group">
+                <label for="id_net_income">Net Income</label>
+                <div class="input-group">
+                    {{ form.net_income_operator }}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    {{ form.net_income }}
+                </div>
+            </div>
+        
+            <div class="form-group">
+                <label for="id_ending_cash">Ending Cash</label>
+                <div class="input-group">
+                    {{ form.ending_cash_operator }}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    {{ form.ending_cash }}
+                </div>
+            </div>
+        
+            <div class="form-group">
+                <label for="id_cash">Cash</label>
+                <div class="input-group">
+                    {{ form.cash_operator }}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    {{ form.cash }}
+                </div>
+            </div>
+        
+            <div class="form-group">
+                <label for="id_current_liabilities">Current Liabilities</label>
+                <div class="input-group">
+                    {{ form.current_liabilities_operator }}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    {{ form.current_liabilities }}
+                </div>
+            </div>
+        
+            <div class="form-group">
+                <label for="id_cash_raised_spent_on_equity">Cash Raised/Spent on Equity</label>
+                <div class="input-group">
+                    {{ form.cash_raised_spent_on_equity_operator }}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    {{ form.cash_raised_spent_on_equity }}
+                </div>
+            </div>
+        
+            <div class="form-group">
+                <label for="id_non_cash_items">Non-Cash Items</label>
+                <div class="input-group">
+                    {{ form.non_cash_items_operator }}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group">
+                    {{ form.non_cash_items }}
+                </div>
+            </div>
 
             <div class="button-container">
                 <button type="submit" class="submit-btn">Generate Report</button>
             </div>
-        </form>
-        {% endif %}
         
         {% if csv_content %}
         <div class="card">
@@ -239,24 +365,21 @@
                 </table>
             </div>
             <hr>
-            <form method="post">
-                {% csrf_token %}
 
-                {% for field in form3 %}
                 <div class="form-group">
-                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    <label for="id_analysis_option">Analysis Option</label>
                     <div class="input-group">
-                        {{ field }}
+                        {{ form.analysis_option }}
                     </div>
                 </div>
-                {% endfor %}
 
                 <div class="button-container">
                     <input type="hidden" name="llm_analysis" value="true">
                     <button type="submit" class="submit-btn">Generate Insights</button>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
+
         {% endif %}
         {% if analysis_result %}
         <div class="card">
