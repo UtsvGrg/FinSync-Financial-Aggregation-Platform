@@ -54,12 +54,12 @@ def outer_schema_mapping():
             "amortization": "amortization",
             "cash_raised_spent_on_debt": "interest_expense",
             "taxes": "taxes",
-            "net_income": "net_income"
+            "net_income": "net_cash_amount" #----***jackard Applied****------
             
         },
         "balance_sheet": {
             "ending_cash": "current_assets",
-            "cash": "cash",
+            "cash": "cash_on_hand", #----***jackard Applied****------
             "long_term_assets": "long_term_assets",
             "current_liabilities": "current_liabilities",
             "cash_raised_spent_on_debt": "long_term_debt",
@@ -68,7 +68,7 @@ def outer_schema_mapping():
         },
         "cash_flow": {
             "ending_cash": "beginning_cash",
-            "net_income": "net_income",
+            "net_income": "net_amount",  #----***jackard Applied****------
             "non_cash_items": "non_cash_items",
             "long_term_assets": "depreciation",
             "amortization": "amortization",
@@ -101,10 +101,13 @@ def query_view(request):
             print(input_form)
 
             field_mapping = outer_schema_mapping()
-
+            print("***----Final Mapping after jackard Applied: ***----: ",field_mapping)
             pnl_query = generate_query("pnl", input_form, field_mapping)
             balance_query = generate_query("balance_sheet", input_form, field_mapping)
             cash_query = generate_query("cash_flow", input_form, field_mapping)
+            print("Pnl_Query: ",pnl_query)
+            print("balance_query: ",balance_query)
+            print("cash_query",cash_query)
             
             queries = {
                 "pnl": pnl_query,
@@ -119,7 +122,7 @@ def query_view(request):
                 queries = llm_caller(input_form['llm_search'])
 
             if queries!=None:
-                print("Queries: ", queries)
+                #print("Queries: ", queries)
                 results = federate_queries(queries)
 
                 schema_map = schema_mapping()
